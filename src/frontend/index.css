@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fraunces — display/heading font */
+@font-face {
+  font-family: "Fraunces";
+  src: url("/assets/fonts/Fraunces.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Crimson Pro — elegant serif body text */
+@font-face {
+  font-family: "Crimson Pro";
+  src: url("/assets/fonts/CrimsonPro.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* General Sans — clean sans for UI labels */
+@font-face {
+  font-family: "General Sans";
+  src: url("/assets/fonts/GeneralSans.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Monastic warm palette */
+    /* Background: warm parchment/cream */
+    --background: 0.97 0.018 75;
+    /* Foreground: deep warm brown */
+    --foreground: 0.22 0.04 50;
+
+    /* Card: slightly warmer cream */
+    --card: 0.95 0.022 72;
+    --card-foreground: 0.22 0.04 50;
+
+    /* Popover */
+    --popover: 0.96 0.02 74;
+    --popover-foreground: 0.22 0.04 50;
+
+    /* Primary: deep forest green */
+    --primary: 0.32 0.1 150;
+    --primary-foreground: 0.97 0.01 90;
+
+    /* Secondary: warm stone beige */
+    --secondary: 0.88 0.03 72;
+    --secondary-foreground: 0.25 0.04 50;
+
+    /* Muted: softer parchment */
+    --muted: 0.91 0.025 75;
+    --muted-foreground: 0.52 0.04 60;
+
+    /* Accent: warm amber/gold */
+    --accent: 0.72 0.14 70;
+    --accent-foreground: 0.15 0.04 40;
+
+    /* Destructive */
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 0.97 0.01 90;
+
+    /* Border & input */
+    --border: 0.82 0.04 70;
+    --input: 0.86 0.035 72;
+    --ring: 0.32 0.1 150;
+
+    /* Chart colors */
+    --chart-1: 0.32 0.1 150;
+    --chart-2: 0.72 0.14 70;
+    --chart-3: 0.55 0.12 55;
+    --chart-4: 0.45 0.08 140;
+    --chart-5: 0.65 0.11 80;
+
+    /* Sidebar */
+    --sidebar: 0.93 0.028 70;
+    --sidebar-foreground: 0.22 0.04 50;
+    --sidebar-primary: 0.32 0.1 150;
+    --sidebar-primary-foreground: 0.97 0.01 90;
+    --sidebar-accent: 0.88 0.03 72;
+    --sidebar-accent-foreground: 0.25 0.04 50;
+    --sidebar-border: 0.82 0.04 70;
+    --sidebar-ring: 0.32 0.1 150;
+
+    /* Custom app tokens */
+    --monastery-green: 0.32 0.1 150;
+    --monastery-green-light: 0.48 0.1 145;
+    --monastery-green-dark: 0.22 0.09 148;
+    --monastery-amber: 0.72 0.14 70;
+    --monastery-amber-light: 0.82 0.12 75;
+    --monastery-cream: 0.97 0.018 75;
+    --monastery-parchment: 0.92 0.03 70;
+    --monastery-stone: 0.75 0.04 65;
+    --monastery-brown: 0.38 0.07 55;
+    --monastery-gold: 0.78 0.18 68;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Crimson Pro", Georgia, serif;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+}
+
+/* Calendar day custom transitions */
+.calendar-day {
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.calendar-day:not(.disabled):hover {
+  transform: scale(1.08);
+}
+
+/* Grain texture overlay for atmospheric feel */
+.grain-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Best date glow */
+.best-date-card {
+  box-shadow: 0 0 0 2px oklch(var(--monastery-gold)), 0 4px 24px oklch(var(--monastery-amber) / 0.25);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: oklch(var(--monastery-parchment));
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(var(--monastery-stone));
+  border-radius: 3px;
+}
