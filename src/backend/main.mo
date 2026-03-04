@@ -3,7 +3,9 @@ import Array "mo:core/Array";
 import Text "mo:core/Text";
 import Order "mo:core/Order";
 import Nat "mo:core/Nat";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   type Participant = {
     name : Text;
@@ -19,24 +21,14 @@ actor {
     };
   };
 
-  let participants = Map.fromIter(
-    [
-      ("Denny", [] : [Text]),
-      ("Rob", [] : [Text]),
-      ("Jan", [] : [Text]),
-      ("Karel", [] : [Text]),
-      ("Matthijs", [] : [Text]),
-    ].values()
-  );
+  var participants = Map.empty<Text, [Text]>();
 
   public query ({ caller }) func getAllParticipants() : async [Participant] {
     participants.entries().toArray().map(func((name, dates)) { { name; dates } });
   };
 
   public shared ({ caller }) func updateAvailability(name : Text, dates : [Text]) : async () {
-    if (participants.containsKey(name)) {
-      participants.add(name, dates);
-    };
+    participants.add(name, dates);
   };
 
   public query ({ caller }) func getSortedParticipantsByAvailability() : async [Participant] {
