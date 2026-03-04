@@ -31,8 +31,16 @@ import {
   useUpdateAvailability,
 } from "./hooks/useQueries";
 
-const PARTICIPANTS = ["Denny", "Rob", "Jan", "Karel", "Matthijs"] as const;
-type ParticipantName = (typeof PARTICIPANTS)[number];
+const DEFAULT_PARTICIPANTS = [
+  "Denny",
+  "Rob",
+  "Jan",
+  "Karel",
+  "Matthijs",
+  "Jasper",
+  "Mark",
+] as const;
+type ParticipantName = string;
 
 // Generate all days for a given month (0-indexed)
 function getDaysInMonth(year: number, month: number) {
@@ -199,13 +207,15 @@ function computeDateAvailability(
 function OverviewSection({
   participants,
   isLoading,
+  allNames,
 }: {
   participants: Array<{ name: string; dates: string[] }>;
   isLoading: boolean;
+  allNames: string[];
 }) {
   const dateAvailability = computeDateAvailability(participants);
   const maxCount = dateAvailability[0]?.participants.length ?? 0;
-  const bestCount = Math.min(maxCount, PARTICIPANTS.length);
+  const bestCount = Math.min(maxCount, allNames.length);
 
   return (
     <section className="py-16 px-4">
@@ -233,7 +243,7 @@ function OverviewSection({
         {/* Participant summary */}
         {participants.length > 0 && (
           <div className="mb-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-            {PARTICIPANTS.map((name) => {
+            {allNames.map((name) => {
               const participant = participants.find((p) => p.name === name);
               const count =
                 participant?.dates.filter(
@@ -281,7 +291,7 @@ function OverviewSection({
           <div data-ocid="overview.table" className="space-y-3">
             {dateAvailability.map(({ dateKey, participants: names }, idx) => {
               const isBest = names.length === bestCount && bestCount >= 2;
-              const isAllFive = names.length === PARTICIPANTS.length;
+              const isAllFive = names.length === allNames.length;
               const ocid = `overview.item.${idx + 1}` as const;
               return (
                 <motion.div
@@ -321,7 +331,7 @@ function OverviewSection({
                   <div className="flex items-center gap-2 flex-wrap">
                     {/* Availability dots */}
                     <div className="flex items-center gap-1">
-                      {PARTICIPANTS.map((p) => (
+                      {allNames.map((p) => (
                         <div
                           key={p}
                           title={p}
@@ -365,10 +375,25 @@ export default function App() {
   );
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [extraNames, setExtraNames] = useState<string[]>([]);
+  const [newNameInput, setNewNameInput] = useState("");
+
+  const allNames = [...DEFAULT_PARTICIPANTS, ...extraNames];
 
   const { data: participants = [], isLoading: overviewLoading } =
     useGetAllParticipants();
   const updateMutation = useUpdateAvailability();
+
+  const handleAddName = () => {
+    const trimmed = newNameInput.trim();
+    if (!trimmed) return;
+    if (allNames.map((n) => n.toLowerCase()).includes(trimmed.toLowerCase())) {
+      toast.error(`"${trimmed}" staat al in de lijst.`);
+      return;
+    }
+    setExtraNames((prev) => [...prev, trimmed]);
+    setNewNameInput("");
+  };
 
   const handleSelectName = (name: ParticipantName) => {
     setSelectedName(name);
@@ -563,8 +588,8 @@ export default function App() {
               <p className="font-ui font-semibold text-foreground/70 text-sm uppercase tracking-wider mb-3">
                 Stap 1 — Kies je naam
               </p>
-              <div className="flex flex-wrap gap-3">
-                {PARTICIPANTS.map((name) => {
+              <div className="flex flex-wrap gap-3 mb-4">
+                {allNames.map((name) => {
                   const isSelected = selectedName === name;
                   return (
                     <button
@@ -584,6 +609,27 @@ export default function App() {
                     </button>
                   );
                 })}
+              </div>
+              {/* Extra naam toevoegen */}
+              <div className="flex items-center gap-2 mt-2">
+                <input
+                  data-ocid="name_selector.input"
+                  type="text"
+                  value={newNameInput}
+                  onChange={(e) => setNewNameInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddName()}
+                  placeholder="Naam toevoegen…"
+                  className="px-4 py-2.5 rounded-lg border border-border bg-card text-foreground font-ui text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-monastery-green/50 focus:border-monastery-green transition-colors w-48"
+                />
+                <Button
+                  data-ocid="name_selector.primary_button"
+                  type="button"
+                  onClick={handleAddName}
+                  disabled={!newNameInput.trim()}
+                  className="bg-monastery-green hover:bg-monastery-green-dark text-primary-foreground font-ui font-semibold px-4 py-2.5 rounded-lg text-sm shadow-sm"
+                >
+                  + Toevoegen
+                </Button>
               </div>
             </div>
 
@@ -697,6 +743,7 @@ export default function App() {
           <OverviewSection
             participants={participants}
             isLoading={overviewLoading}
+            allNames={allNames}
           />
         </section>
 
@@ -1004,7 +1051,8 @@ export default function App() {
               Abdij van Berne — Uitje plannen
             </p>
             <p className="text-primary-foreground/70 text-sm font-ui">
-              Denny, Rob, Jan, Karel & Matthijs
+              {allNames.slice(0, -1).join(", ")} &{" "}
+              {allNames[allNames.length - 1]}
             </p>
           </div>
           <p className="text-primary-foreground/60 text-xs font-ui">
